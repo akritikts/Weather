@@ -5,14 +5,22 @@
     android:layout_height="match_parent"
     android:background="#4fc3f7"
     android:orientation="vertical">
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:id="@+id/cornr"
+        android:src="@drawable/sun_corner"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"/>
 
     <ImageView
         android:id="@+id/image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
-        android:src="@drawable/sun1" />
+        android:src="@drawable/cloud" />
 
     <TextView
         android:id="@+id/text"

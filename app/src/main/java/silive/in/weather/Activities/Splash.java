@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,7 +23,7 @@ public class Splash extends AppCompatActivity {
     Context context;
     RelativeLayout splash;
     TextView text;
-    ImageView image;
+    ImageView image,cornr;
     //ViewAnimator viewAnimator;
 
     @Override
@@ -35,9 +34,11 @@ public class Splash extends AppCompatActivity {
         splash = (RelativeLayout) findViewById(R.id.splash);
         text = (TextView) findViewById(R.id.text);
         image = (ImageView)findViewById(R.id.image);
-        image.startAnimation(AnimationUtils.loadAnimation(this,R.anim.splash_animation));
+        cornr = (ImageView)findViewById(R.id.cornr);
+        cornr.setVisibility(View.INVISIBLE);
+        //image.startAnimation(AnimationUtils.loadAnimation(this,R.anim.splash_animation));
         /*ViewAnimator
-                .animate(text)
+                .animate(image)
                 .dp().translationX(-30, 0)
                 .descelerate()
                 .duration(3000)
@@ -87,6 +88,7 @@ public class Splash extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    cornr.setVisibility(View.VISIBLE);
                     Intent intent = new Intent(Splash.this, MainActivity.class);
                     startActivity(intent);
                     finish();
