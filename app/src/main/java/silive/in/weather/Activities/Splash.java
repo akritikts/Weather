@@ -1,4 +1,4 @@
-package silive.in.weather;
+package silive.in.weather.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +15,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import silive.in.weather.Models.GPSTracker;
+import silive.in.weather.R;
 
 public class Splash extends AppCompatActivity {
     public double lat, lng;

@@ -1,4 +1,4 @@
-package silive.in.weather;
+package silive.in.weather.Models;
 
 /**
  * Created by akriti on 20/6/16.
@@ -151,15 +151,20 @@ public class GPSTracker extends Service implements LocationListener {
         return longitude;
     }
 
-    public String GetCity() {
+    public String GetCity(double latitude,double longitude) {
         Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
         StringBuilder builder = new StringBuilder();
         try {
             List<Address> address = geoCoder.getFromLocation(latitude, longitude, 1);
+            Log.d("TAG",latitude+" "+longitude );
             int maxLines = address.get(0).getMaxAddressLineIndex();
+            //int maxLines = 2;
+
             for (int i = 0; i < maxLines; i++) {
+                Log.d("TAG",maxLines+" ");
                 String addressStr = address.get(0).getAddressLine(i);
-                if ((i >= 1)&&(i<=(maxLines-1))) {
+                Log.d("TAG",maxLines+" ");
+                if ((i >= 1) && (i <= (maxLines - 1))) {
                     builder.append(addressStr);
                     builder.append(" ");
                 }
