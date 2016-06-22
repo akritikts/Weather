@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     double latitude, longitude;
     ImageView icon;
     ImageButton ref;
+    TextView humidity,dew,cloud,precip,max_temp,min_temp;
     String APIKey = "5b29d34aeee88dc47264e71ed058a592";
 
 
@@ -47,6 +48,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         city_text = (TextView) findViewById(R.id.city_text);
         temp = (TextView) findViewById(R.id.temp);
         temp_unit = (TextView) findViewById(R.id.temp_unit);
+        humidity = (TextView)findViewById(R.id.humidity);
+        dew = (TextView)findViewById(R.id.dew);
+        precip = (TextView)findViewById(R.id.precip);
+        cloud = (TextView)findViewById(R.id.cloud);
+        max_temp = (TextView)findViewById(R.id.max_temp);
+        min_temp = (TextView)findViewById(R.id.min_temp);
         sky_desc = (TextView) findViewById(R.id.sky_desc);
         icon = (ImageView) findViewById(R.id.icon);
         ref = (ImageButton) findViewById(R.id.ref);
@@ -111,6 +118,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 hourly.setText(hrs);
                 String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
                 date_day.setText(mydate);
+                String pres,prec,humid,dewp;
+                double max,min;
+                pres = weatherResponse.getCurrently().getPressure();
+                prec = weatherResponse.getCurrently().getPrecipIntensity();
+                humid = weatherResponse.getCurrently().getHumidity();
+                dewp = weatherResponse.getCurrently().getDewPoint();
+                max = weatherResponse.getCurrently().getTemperatureMax();
+                min = weatherResponse.getCurrently().getTemperatureMin();
+                cloud.setText("Pressure : "+pres);
+                Log.d("TAG",max+" "+min);
+                Log.d("TAG",pres+" ");
+                precip.setText("Precipitation : "+prec);
+                humidity.setText("Humidity : "+humid);
+                dew.setText("Dew Point : "+dewp);
+                max_temp.setText("Max.T : "+max);
+                min_temp.setText("Min.T : "+min);
                 updateTimeOnEachSecond();
 
             }
