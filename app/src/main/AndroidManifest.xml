@@ -18,7 +18,7 @@
         android:required="true" />
     <uses-feature
         android:name="android.hardware.location.gps"
-        android:required="false" />
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -37,6 +37,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.MainActivity"/>
+        <meta-data android:name="com.johnhiott.darkskyandroidlib" android:value="5b29d34aeee88dc47264e71ed058a592"/>
 
 
 

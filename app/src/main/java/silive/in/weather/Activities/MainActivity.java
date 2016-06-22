@@ -109,7 +109,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 long time = weatherResponse.getCurrently().getTime();
                 String hrs = weatherResponse.getHourly().getSummary();
                 hourly.setText(hrs);
+                String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+                date_day.setText(mydate);
                 updateTimeOnEachSecond();
+
             }
 
             @Override
