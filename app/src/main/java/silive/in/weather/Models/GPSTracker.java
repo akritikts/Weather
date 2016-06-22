@@ -152,6 +152,10 @@ public class GPSTracker extends Service implements LocationListener {
     }
 
     public String GetCity(double latitude,double longitude) {
+        if (latitude==0||longitude==0){
+            latitude = getLatitude();
+            longitude = getLongitude();
+        }
         Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
         StringBuilder builder = new StringBuilder();
         try {
