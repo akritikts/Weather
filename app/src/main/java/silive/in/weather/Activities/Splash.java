@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import silive.in.weather.Models.GPSTracker;
 import silive.in.weather.R;
 
 public class Splash extends AppCompatActivity {
@@ -23,7 +22,7 @@ public class Splash extends AppCompatActivity {
     Context context;
     RelativeLayout splash;
     TextView text;
-    ImageView image,cornr;
+    ImageView image, cornr;
     //ViewAnimator viewAnimator;
 
     @Override
@@ -33,8 +32,8 @@ public class Splash extends AppCompatActivity {
         context = getApplicationContext();
         splash = (RelativeLayout) findViewById(R.id.splash);
         text = (TextView) findViewById(R.id.text);
-        image = (ImageView)findViewById(R.id.image);
-        cornr = (ImageView)findViewById(R.id.cornr);
+        image = (ImageView) findViewById(R.id.image);
+        cornr = (ImageView) findViewById(R.id.cornr);
         cornr.setVisibility(View.INVISIBLE);
         //image.startAnimation(AnimationUtils.loadAnimation(this,R.anim.splash_animation));
         /*ViewAnimator
@@ -52,6 +51,15 @@ public class Splash extends AppCompatActivity {
     public void checkConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+       /* GPSTracker gps = new GPSTracker(context);
+        if (gps.canGetLocation()) {
+            lng = gps.getLongitude();
+            lat = gps.getLatitude();
+            // gps enabled
+        } else {
+            gps.showSettingsAlert();
+        }
+*/
         if (info == null) {
             //   Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
             //no_net_connection.setVisibility(View.VISIBLE);
@@ -60,14 +68,6 @@ public class Splash extends AppCompatActivity {
                     .setAction("RETRY", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            GPSTracker gps = new GPSTracker(context);
-                            if (gps.canGetLocation()) {
-                                lng = gps.getLongitude();
-                                lat = gps.getLatitude();
-                                // gps enabled
-                            } else {
-                                gps.showSettingsAlert();
-                            }
 
 
                             checkConnection();

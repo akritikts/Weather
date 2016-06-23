@@ -71,87 +71,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void WeatherUpdate(final double lat,final double lng) {
-        final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
 
-        /*if (gpsTracker.canGetLocation()) {
-
-            lat = gpsTracker.getLatitude();
-            lng = gpsTracker.getLongitude();
-        } else {
-            Log.d("TAG", " no gps");
-            gpsTracker.showSettingsAlert();
-        }*/
-        RequestBuilder weather = new RequestBuilder();
-        Log.d("TAG", lat + "" + lng);
-
-        Request request = new Request();
-        request.setLat(lat + "");
-        request.setLng(lng + "");
-        request.setUnits(Request.Units.UK);
-        request.setLanguage(Request.Language.ENGLISH);
-        request.addExcludeBlock(Request.Block.CURRENTLY);
-        request.removeExcludeBlock(Request.Block.CURRENTLY);
-        /*final double alat, along;
-        alat = lat;
-        along = lng;*/
-        //Log.d("TAG", alat + "" + along);
-
-        weather.getWeather(request, new Callback<WeatherResponse>() {
-            @Override
-            public void success(WeatherResponse weatherResponse, Response response) {
-                Log.d("TAG", "Temp: " + weatherResponse.getCurrently().getTemperature());
-                Log.d("TAG", "Summary: " + weatherResponse.getCurrently().getSummary());
-                Log.d("TAG", "Hourly Sum: " + weatherResponse.getHourly().getSummary());
-                double temperature = weatherResponse.getCurrently().getTemperature();
-                temp.setText(" " + temperature);
-                temp_unit.setText("C");
-                String desc = weatherResponse.getCurrently().getSummary();
-                sky_desc.setText(desc);
-                String img = weatherResponse.getCurrently().getIcon();
-                //icon.setImageResource(Integer.parseInt(img));
-                setIcon(img);
-                //Log.d("TAG", alat + "" + along);
-                city_text.setText(gpsTracker.GetCity(lat, lng));
-                long time = weatherResponse.getCurrently().getTime();
-                String hrs = weatherResponse.getHourly().getSummary();
-                hourly.setText(hrs);
-                String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-                date_day.setText(mydate);
-                String pres,prec,humid,dewp;
-                double max,min;
-                pres = weatherResponse.getCurrently().getPressure();
-                prec = weatherResponse.getCurrently().getPrecipIntensity();
-                humid = weatherResponse.getCurrently().getHumidity();
-                dewp = weatherResponse.getCurrently().getDewPoint();
-                max = weatherResponse.getCurrently().getTemperatureMax();
-                min = weatherResponse.getCurrently().getTemperatureMin();
-                cloud.setText("Pressure : "+pres);
-                Log.d("TAG",max+" "+min);
-                Log.d("TAG",pres+" ");
-                precip.setText("Precipitation : "+prec);
-                humidity.setText("Humidity : "+humid);
-                dew.setText("Dew Point : "+dewp);
-                max_temp.setText("Max.T : "+max);
-                min_temp.setText("Min.T : "+min);
-                updateTimeOnEachSecond();
-
-            }
-
-            @Override
-            public void failure(RetrofitError retrofitError) {
-                Log.d("TAG", "Error while calling: " + retrofitError.getUrl());
-                Log.d("TAG", retrofitError.toString());
-            }
-        });
-
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ref:
-                WeatherUpdate(latitude,longitude);
+                new GetData(this).execute();
+                //WeatherUpdate(latitude,longitude);
                 break;
         }
     }
@@ -243,7 +170,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected String doInBackground(Void... params) {
-            WeatherUpdate(lat,lng);
+
+                final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
+                RequestBuilder weather = new RequestBuilder();
+                Log.d("TAG", lat + "" + lng);
+
+                Request request = new Request();
+                request.setLat(lat + "");
+                request.setLng(lng + "");
+                request.setUnits(Request.Units.UK);
+                request.setLanguage(Request.Language.ENGLISH);
+                request.addExcludeBlock(Request.Block.CURRENTLY);
+                request.removeExcludeBlock(Request.Block.CURRENTLY);
+                weather.getWeather(request, new Callback<WeatherResponse>() {
+                    @Override
+                    public void success(WeatherResponse weatherResponse, Response response) {
+                        Log.d("TAG", "Temp: " + weatherResponse.getCurrently().getTemperature());
+                        Log.d("TAG", "Summary: " + weatherResponse.getCurrently().getSummary());
+                        Log.d("TAG", "Hourly Sum: " + weatherResponse.getHourly().getSummary());
+                        double temperature = weatherResponse.getCurrently().getTemperature();
+                        temp.setText(" " + temperature);
+                        temp_unit.setText("C");
+                        String desc = weatherResponse.getCurrently().getSummary();
+                        sky_desc.setText(desc);
+                        String img = weatherResponse.getCurrently().getIcon();
+                        //icon.setImageResource(Integer.parseInt(img));
+                        setIcon(img);
+                        //Log.d("TAG", alat + "" + along);
+                        city_text.setText(gpsTracker.GetCity(lat, lng));
+                        long time = weatherResponse.getCurrently().getTime();
+                        String hrs = weatherResponse.getHourly().getSummary();
+                        hourly.setText(hrs);
+                        String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+                        date_day.setText(mydate);
+                        String pres,prec,humid,dewp;
+                        double max,min;
+                        pres = weatherResponse.getCurrently().getPressure();
+                        prec = weatherResponse.getCurrently().getPrecipIntensity();
+                        humid = weatherResponse.getCurrently().getHumidity();
+                        dewp = weatherResponse.getCurrently().getDewPoint();
+                        max = weatherResponse.getCurrently().getTemperatureMax();
+                        min = weatherResponse.getCurrently().getTemperatureMin();
+                        cloud.setText("Pressure : "+pres);
+                        Log.d("TAG",max+" "+min);
+                        Log.d("TAG",pres+" ");
+                        precip.setText("Precipitation : "+prec);
+                        humidity.setText("Humidity : "+humid);
+                        dew.setText("Dew Point : "+dewp);
+                        max_temp.setText("Max.T : "+max);
+                        min_temp.setText("Min.T : "+min);
+                        updateTimeOnEachSecond();
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError retrofitError) {
+                        Log.d("TAG", "Error while calling: " + retrofitError.getUrl());
+                        Log.d("TAG", retrofitError.toString());
+                    }
+                });
+
+
+            //WeatherUpdate(lat,lng);
             return null;
         }
     }

@@ -155,6 +155,9 @@ public class GPSTracker extends Service implements LocationListener {
         if (latitude==0||longitude==0){
             latitude = getLatitude();
             longitude = getLongitude();
+            if (latitude ==0||longitude==0){
+                showSettingsAlert();
+            }
         }
         Geocoder geoCoder = new Geocoder(this, Locale.getDefault());
         StringBuilder builder = new StringBuilder();
