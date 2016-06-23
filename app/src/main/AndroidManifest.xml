@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
 
+
     <uses-feature
         android:name="android.hardware.location"
         android:required="true" />
@@ -53,6 +54,10 @@
         <meta-data
             android:name="com.johnhiott.darkskyandroidlib"
             android:value="5b29d34aeee88dc47264e71ed058a592" />
+        <!--<service
+            android:name="silive.in.weather.Models.GPSTracker"
+        android:enabled="true" />-->
+
 
 
     </application>

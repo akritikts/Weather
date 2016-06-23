@@ -8,8 +8,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,10 +16,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by akriti on 20/6/16.
@@ -32,7 +26,7 @@ public class GPSTracker extends Service implements LocationListener {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
     // The minimum time between updates in milliseconds
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
-    private final Context mContext;
+    private final Context mContext ;
     // Declaring a Location Manager
     protected LocationManager locationManager;
     // flag for GPS status
@@ -47,7 +41,7 @@ public class GPSTracker extends Service implements LocationListener {
 
     public GPSTracker(Context context) {
         this.mContext = context;
-        if (Build.VERSION.SDK_INT >= 23 &&
+        if (Build.VERSION.SDK_INT >= 24 &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -55,11 +49,12 @@ public class GPSTracker extends Service implements LocationListener {
         getLocation();
     }
 
+    /*public GPSTracker() {
+    }*/
 
     public Location getLocation() {
         try {
-            locationManager = (LocationManager) mContext
-                    .getSystemService(LOCATION_SERVICE);
+            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
 
             // getting GPS status
             isGPSEnabled = locationManager
@@ -113,18 +108,7 @@ public class GPSTracker extends Service implements LocationListener {
         return location;
     }
 
-    /**
-     * Stop using GPS listener
-     */
-    /*public void stopUsingGPS() {
-        if (locationManager != null) {
-            locationManager.removeUpdates(GPSTracker.this);
-        }
-    }*/
 
-    /**
-     * Function to get latitude
-     */
     public double getLatitude() {
         if (location != null) {
             latitude = location.getLatitude();
@@ -134,9 +118,7 @@ public class GPSTracker extends Service implements LocationListener {
         return latitude;
     }
 
-    /**
-     * Function to get longitude
-     */
+
     public double getLongitude() {
         if (location != null) {
             longitude = location.getLongitude();
@@ -145,8 +127,14 @@ public class GPSTracker extends Service implements LocationListener {
         // return longitude
         return longitude;
     }
+    /*@Override
+    public void onLocationChanged(Location location) {
+        this.location = location;
+        getLatitude();
+        getLongitude();
+    }*/
 
-    public String GetCity(double latitude,double longitude) {
+    /*public String GetCity(double latitude,double longitude) {
         Log.d("TAG",latitude+" "+longitude +"one");
         if (latitude==0||longitude==0){
             latitude = getLatitude();
@@ -186,22 +174,14 @@ public class GPSTracker extends Service implements LocationListener {
         }
         return null;
 
-    }
+    }*/
 
 
-    /**
-     * Function to check GPS/wifi enabled
-     *
-     * @return boolean
-     */
+
     public boolean canGetLocation() {
         return this.canGetLocation;
     }
 
-    /**
-     * Function to show settings alert dialog
-     * On pressing Settings button will lauch Settings Options
-     */
     public void showSettingsAlert() {
         /*FragmentManager fragmentManager = mContext ;
         DialogGps dialogGps = new DialogGps();
