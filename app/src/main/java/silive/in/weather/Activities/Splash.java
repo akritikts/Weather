@@ -10,11 +10,14 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import silive.in.weather.DialogGps;
+import silive.in.weather.Models.GPSTracker;
 import silive.in.weather.R;
 
 public class Splash extends AppCompatActivity {
@@ -35,6 +38,23 @@ public class Splash extends AppCompatActivity {
         image = (ImageView) findViewById(R.id.image);
         cornr = (ImageView) findViewById(R.id.cornr);
         cornr.setVisibility(View.INVISIBLE);
+         GPSTracker gps = new GPSTracker(context);
+        if (gps.canGetLocation()) {
+            lng = gps.getLongitude();
+            lat = gps.getLatitude();
+            Log.d("TAG",lat+" "+lng);
+            if (lat==0||lng==0){
+                DialogGps dialogGps = new DialogGps();
+                dialogGps.show(getFragmentManager(),"GPS Alert");
+                //gps.showSettingsAlert();
+            }
+            // gps enabled
+        } else {
+            DialogGps dialogGps = new DialogGps();
+            dialogGps.show(getFragmentManager(),"GPS Alert");
+            //gps.showSettingsAlert();
+        }
+
         //image.startAnimation(AnimationUtils.loadAnimation(this,R.anim.splash_animation));
         /*ViewAnimator
                 .animate(image)
@@ -51,15 +71,6 @@ public class Splash extends AppCompatActivity {
     public void checkConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
-       /* GPSTracker gps = new GPSTracker(context);
-        if (gps.canGetLocation()) {
-            lng = gps.getLongitude();
-            lat = gps.getLatitude();
-            // gps enabled
-        } else {
-            gps.showSettingsAlert();
-        }
-*/
         if (info == null) {
             //   Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
             //no_net_connection.setVisibility(View.VISIBLE);

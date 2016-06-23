@@ -6,7 +6,6 @@ package silive.in.weather.Models;
 
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -17,9 +16,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import java.io.IOException;
@@ -76,7 +73,6 @@ public class GPSTracker extends Service implements LocationListener {
                 // no network provider is enabled
             } else {
                 this.canGetLocation = true;
-                // First get location from Network Provider
                 if (isNetworkEnabled) {
                     //checkPermission("GPS",1,1);
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
@@ -119,7 +115,6 @@ public class GPSTracker extends Service implements LocationListener {
 
     /**
      * Stop using GPS listener
-     * Calling this function will stop using GPS in your app
      */
     /*public void stopUsingGPS() {
         if (locationManager != null) {
@@ -152,11 +147,15 @@ public class GPSTracker extends Service implements LocationListener {
     }
 
     public String GetCity(double latitude,double longitude) {
+        Log.d("TAG",latitude+" "+longitude +"one");
         if (latitude==0||longitude==0){
             latitude = getLatitude();
             longitude = getLongitude();
-            if (latitude ==0||longitude==0){
-                showSettingsAlert();
+            Log.d("TAG",latitude+" "+longitude +"two");
+            while (latitude==0||longitude==0){
+                latitude = getLatitude();
+                longitude = getLongitude();
+
             }
         }
         Geocoder geoCoder = new Geocoder(mContext, Locale.getDefault());
@@ -204,7 +203,10 @@ public class GPSTracker extends Service implements LocationListener {
      * On pressing Settings button will lauch Settings Options
      */
     public void showSettingsAlert() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+        /*FragmentManager fragmentManager = mContext ;
+        DialogGps dialogGps = new DialogGps();
+        dialogGps.show(,"GPS Alert");*/
+        /*AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
         // Setting Dialog Title
         alertDialog.setTitle("GPS settings");
@@ -228,7 +230,7 @@ public class GPSTracker extends Service implements LocationListener {
         });
 
         // Showing Alert Message
-        alertDialog.show();
+        alertDialog.show();*/
     }
 
 

@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="silive.in.weather.DialogGps"
+    android:orientation="vertical"
+    android:background="#01bedb">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Please turn on your GPS"
+        android:textColor="#000000"
+        android:textSize="25sp"
+        android:layout_margin="5dp"/>
+
+    <Button
+        android:id="@+id/gps_ok"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="OK"
+        android:backgroundTint="#ffffff"/>
+
+</LinearLayout>

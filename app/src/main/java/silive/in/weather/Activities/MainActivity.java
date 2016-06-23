@@ -23,6 +23,7 @@ import java.util.TimerTask;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import silive.in.weather.DialogGps;
 import silive.in.weather.Models.GPSTracker;
 import silive.in.weather.R;
 
@@ -150,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 this.lng = gpsTracker.getLongitude();
             } else {
                 Log.d("TAG", " no gps");
-                gpsTracker.showSettingsAlert();
+                DialogGps dialogGps = new DialogGps();
+                dialogGps.show(getFragmentManager(),"GPS Alert");
+                //gpsTracker.showSettingsAlert();
             }
         }
 
