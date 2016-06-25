@@ -28,4 +28,5 @@ dependencies {
     compile 'android.zetterstrom.com.forecast:forecast:1.0.0'
     compile 'com.pnikosis:materialish-progress:1.7'
     compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.google.android.gms:play-services:9.0.2'
 }

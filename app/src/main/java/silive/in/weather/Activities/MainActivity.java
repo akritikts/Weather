@@ -28,8 +28,8 @@ import java.util.TimerTask;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import silive.in.weather.Fragments.DialogGps;
 import silive.in.weather.Models.GPSTracker;
+import silive.in.weather.Models.GetLocation;
 import silive.in.weather.Models.WeatherData;
 import silive.in.weather.R;
 
@@ -40,14 +40,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ImageButton ref;
     TextView humidity, dew, cloud, precip, max_temp, min_temp;
     String APIKey = "5b29d34aeee88dc47264e71ed058a592";
+    String GeoAPIKey = "AIzaSyAX52peWddi3gJQfuB-5teYPoo5haPb5Iw";
     WeatherData weatherData;
+    GetLocation getLocation;
+    Context context;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        context = getApplicationContext();
         current_time = (TextView) findViewById(R.id.current_time);
         current_time_min = (TextView) findViewById(R.id.current_time_min);
         current_time_sec = (TextView) findViewById(R.id.current_time_sec);
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ref = (ImageButton) findViewById(R.id.ref);
         ref.setOnClickListener(this);
         weatherData = new WeatherData();
+        getLocation = new GetLocation(this);
 
 
         ForecastApi.create(APIKey);
@@ -146,16 +150,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public String GetCity(double latitude, double longitude) {
         Log.d("TAG", latitude + " " + longitude + "one");
-        /*if (latitude==0||longitude==0){
-            latitude = getLatitude();
-            longitude = getLongitude();
-            Log.d("TAG",latitude+" "+longitude +"two");
-            while (latitude==0||longitude==0){
-                latitude = getLatitude();
-                longitude = getLongitude();
-
-            }
-        }*/
         Geocoder geoCoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         StringBuilder builder = new StringBuilder();
         try {
@@ -188,21 +182,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     //Class to get API data
-    public class GetData extends AsyncTask<Void, Void, WeatherData> {
+    public class GetData extends AsyncTask<Void, Void, String> {
         ProgressDialog progressDialog;
-        /* String desc;
-         String pres, prec, humid, dewp, hrs, mydate;
-         double max, min, temperature;*/
         private double lat, lng;
 
 
-        public GetData() {
-
-        }
-
         public GetData(Context c) {
             this.progressDialog = new ProgressDialog(c);
-            final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
+            this.lat = getLocation.getLatitude();
+            this.lng = getLocation.getLongitude();
+            Log.d("TAG", lat + " " + lng + " inside GetData");
+
+            /*final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
 
             if (gpsTracker.canGetLocation()) {
 
@@ -213,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 DialogGps dialogGps = new DialogGps();
                 dialogGps.show(getFragmentManager(), "GPS Alert");
                 //gpsTracker.showSettingsAlert();
-            }
+            }*/
             Log.d("TAG", lat + " " + lng + "inside getData");
         }
 
@@ -246,16 +237,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        protected void onPostExecute(WeatherData s) {
+        protected void onPostExecute(String s) {
             super.onPostExecute(s);
             progressDialog.dismiss();
-            UpdateUI(s);
         }
 
 
         @Override
-        protected WeatherData doInBackground(Void... params) {
-            //final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
+        protected String doInBackground(Void... params) {
             RequestBuilder weather = new RequestBuilder();
             Log.d("TAG", lat + "" + lng);
 
@@ -278,8 +267,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String img = weatherResponse.getCurrently().getIcon();
                     //icon.setImageResource(Integer.parseInt(img));
                     setIcon(img);
-                    //city_text.setText(GetCity(lat, lng));
-                    long time = weatherResponse.getCurrently().getTime();
                     weatherData.setHrs(weatherResponse.getHourly().getSummary());
                     weatherData.setMydate(java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime()));
                     weatherData.setPres(weatherResponse.getCurrently().getPressure());
@@ -288,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     weatherData.setDewp(weatherResponse.getCurrently().getDewPoint());
                     weatherData.setMax(weatherResponse.getCurrently().getTemperatureMax());
                     weatherData.setMin(weatherResponse.getCurrently().getTemperatureMin());
+                    UpdateUI(weatherData);
                 }
 
                 @Override
@@ -298,8 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
 
 
-            //WeatherUpdate(lat,lng);
-            return weatherData;
+            return null;
         }
     }
 }
