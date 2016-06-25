@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="silive.in.weather.DialogGps"
+    tools:context=".Fragments.DialogGps"
     android:orientation="vertical"
     android:background="#01bedb">
 

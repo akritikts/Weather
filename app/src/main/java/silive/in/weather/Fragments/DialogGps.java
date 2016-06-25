@@ -1,4 +1,4 @@
-package silive.in.weather;
+package silive.in.weather.Fragments;
 
 
 import android.app.DialogFragment;
@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import silive.in.weather.R;
 
 
 /**

@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import silive.in.weather.DialogGps;
+import silive.in.weather.Fragments.DialogGps;
 import silive.in.weather.Models.GPSTracker;
 import silive.in.weather.R;
 

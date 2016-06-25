@@ -28,8 +28,9 @@ import java.util.TimerTask;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import silive.in.weather.DialogGps;
+import silive.in.weather.Fragments.DialogGps;
 import silive.in.weather.Models.GPSTracker;
+import silive.in.weather.Models.WeatherData;
 import silive.in.weather.R;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ImageButton ref;
     TextView humidity, dew, cloud, precip, max_temp, min_temp;
     String APIKey = "5b29d34aeee88dc47264e71ed058a592";
+    WeatherData weatherData;
 
 
     @Override
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         icon = (ImageView) findViewById(R.id.icon);
         ref = (ImageButton) findViewById(R.id.ref);
         ref.setOnClickListener(this);
+        weatherData = new WeatherData();
 
 
         ForecastApi.create(APIKey);
@@ -183,10 +186,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     //Class to get API data
-    public class GetData extends AsyncTask<Void, Void, String> {
+    public class GetData extends AsyncTask<Void, Void, WeatherData> {
         ProgressDialog progressDialog;
+        /* String desc;
+         String pres, prec, humid, dewp, hrs, mydate;
+         double max, min, temperature;*/
         private double lat, lng;
+
+
+        public GetData() {
+
+        }
 
         public GetData(Context c) {
             this.progressDialog = new ProgressDialog(c);
@@ -205,6 +217,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("TAG", lat + " " + lng + "inside getData");
         }
 
+        public void UpdateUI(WeatherData getData) {
+            temp.setText(" " + getData.getTemperature());
+            temp_unit.setText("C");
+            sky_desc.setText(getData.getDesc());
+            city_text.setText(GetCity(lat, lng));
+            hourly.setText(getData.getHrs());
+            date_day.setText(getData.getMydate());
+            cloud.setText("Pressure : " + getData.getPres());
+            Log.d("TAG", getData.getMax() + " " + getData.getMin() + "max min");
+            Log.d("TAG", getData.getPres() + " " + "pressure");
+            precip.setText("Precipitation : " + getData.getPrec());
+            humidity.setText("Humidity : " + getData.getHumid());
+            dew.setText("Dew Point : " + getData.getDewp());
+            max_temp.setText("Max.T : " + getData.getMax());
+            min_temp.setText("Min.T : " + getData.getMin());
+            updateTimeOnEachSecond();
+
+        }
+
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -214,17 +246,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(WeatherData s) {
             super.onPostExecute(s);
             progressDialog.dismiss();
+            UpdateUI(s);
         }
 
-        @Override
-        protected String doInBackground(Void... params) {
 
-            final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
+        @Override
+        protected WeatherData doInBackground(Void... params) {
+            //final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
             RequestBuilder weather = new RequestBuilder();
             Log.d("TAG", lat + "" + lng);
+
 
             Request request = new Request();
             request.setLat(lat + "");
@@ -239,38 +273,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d("TAG", "Temp: " + weatherResponse.getCurrently().getTemperature());
                     Log.d("TAG", "Summary: " + weatherResponse.getCurrently().getSummary());
                     Log.d("TAG", "Hourly Sum: " + weatherResponse.getHourly().getSummary());
-                    double temperature = weatherResponse.getCurrently().getTemperature();
-                    temp.setText(" " + temperature);
-                    temp_unit.setText("C");
-                    String desc = weatherResponse.getCurrently().getSummary();
-                    sky_desc.setText(desc);
+                    weatherData.setTemperature(weatherResponse.getCurrently().getTemperature());
+                    weatherData.setDesc(weatherResponse.getCurrently().getSummary());
                     String img = weatherResponse.getCurrently().getIcon();
                     //icon.setImageResource(Integer.parseInt(img));
                     setIcon(img);
-                    city_text.setText(GetCity(lat, lng));
+                    //city_text.setText(GetCity(lat, lng));
                     long time = weatherResponse.getCurrently().getTime();
-                    String hrs = weatherResponse.getHourly().getSummary();
-                    hourly.setText(hrs);
-                    String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-                    date_day.setText(mydate);
-                    String pres, prec, humid, dewp;
-                    double max, min;
-                    pres = weatherResponse.getCurrently().getPressure();
-                    prec = weatherResponse.getCurrently().getPrecipIntensity();
-                    humid = weatherResponse.getCurrently().getHumidity();
-                    dewp = weatherResponse.getCurrently().getDewPoint();
-                    max = weatherResponse.getCurrently().getTemperatureMax();
-                    min = weatherResponse.getCurrently().getTemperatureMin();
-                    cloud.setText("Pressure : " + pres);
-                    Log.d("TAG", max + " " + min + "max min");
-                    Log.d("TAG", pres + " " + "pressure");
-                    precip.setText("Precipitation : " + prec);
-                    humidity.setText("Humidity : " + humid);
-                    dew.setText("Dew Point : " + dewp);
-                    max_temp.setText("Max.T : " + max);
-                    min_temp.setText("Min.T : " + min);
-                    updateTimeOnEachSecond();
-
+                    weatherData.setHrs(weatherResponse.getHourly().getSummary());
+                    weatherData.setMydate(java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime()));
+                    weatherData.setPres(weatherResponse.getCurrently().getPressure());
+                    weatherData.setPrec(weatherResponse.getCurrently().getPrecipIntensity());
+                    weatherData.setHumid(weatherResponse.getCurrently().getHumidity());
+                    weatherData.setDewp(weatherResponse.getCurrently().getDewPoint());
+                    weatherData.setMax(weatherResponse.getCurrently().getTemperatureMax());
+                    weatherData.setMin(weatherResponse.getCurrently().getTemperatureMin());
                 }
 
                 @Override
@@ -282,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             //WeatherUpdate(lat,lng);
-            return null;
+            return weatherData;
         }
     }
 }
