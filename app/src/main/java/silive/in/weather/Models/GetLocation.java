@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,27 +33,30 @@ public class GetLocation implements GoogleApiClient.ConnectionCallbacks, GoogleA
                     .build();
         }
 
-        /*if (Build.VERSION.SDK_INT >= 24 &&
+       /* if (Build.VERSION.SDK_INT >= 24 &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
             latitude = mLastLocation.getLatitude();
             longitude = mLastLocation.getLongitude();
-                *//*mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-                mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));*//*
+            Log.d("TAG",latitude+" cal lat");
+            Log.d("TAG",longitude+" cal lng");
+                //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+                //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
         }*/
     }
 
     public double getLatitude() {
+        Log.d("TAG",latitude+" get lat");
         return latitude;
     }
 
 
     public double getLongitude() {
+        Log.d("TAG",longitude +" get lng");
         return longitude;
     }
 
@@ -69,6 +73,8 @@ public class GetLocation implements GoogleApiClient.ConnectionCallbacks, GoogleA
         if (mLastLocation != null) {
             latitude = mLastLocation.getLatitude();
             longitude = mLastLocation.getLongitude();
+            Log.d("TAG",latitude+" cal lat");
+            Log.d("TAG",longitude+" cal lng");
                 /*mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
                 mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));*/
         }

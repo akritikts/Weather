@@ -28,7 +28,6 @@ import java.util.TimerTask;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import silive.in.weather.Models.GPSTracker;
 import silive.in.weather.Models.GetLocation;
 import silive.in.weather.Models.WeatherData;
 import silive.in.weather.R;
@@ -71,17 +70,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ref.setOnClickListener(this);
         weatherData = new WeatherData();
         getLocation = new GetLocation(this);
+        latitude = getLocation.getLatitude();
+        longitude = getLocation.getLongitude();
+        Log.d("TAG", latitude + " " + longitude + "inside onCreate");
 
 
         ForecastApi.create(APIKey);
-        final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
+        /*final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
         if (gpsTracker.canGetLocation()) {
 
             latitude = gpsTracker.getLatitude();
             longitude = gpsTracker.getLongitude();
             Log.d("TAG", latitude + " " + longitude + "inside onCreate");
-        }
-        new GetData(this).execute();
+        }*/
+        RequestBuilder weather = new RequestBuilder();
+        Request request = new Request();
+        request.setLat(latitude + "");
+        request.setLng(longitude + "");
+        request.setUnits(Request.Units.UK);
+        request.setLanguage(Request.Language.ENGLISH);
+        request.addExcludeBlock(Request.Block.CURRENTLY);
+        request.removeExcludeBlock(Request.Block.CURRENTLY);
+        weather.getWeather(request, new Callback<WeatherResponse>() {
+            @Override
+            public void success(WeatherResponse weatherResponse, Response response) {
+                Log.d("TAG", "Temp: " + weatherResponse.getCurrently().getTemperature());
+                Log.d("TAG", "Summary: " + weatherResponse.getCurrently().getSummary());
+                Log.d("TAG", "Hourly Sum: " + weatherResponse.getHourly().getSummary());
+                weatherData.setTemperature(weatherResponse.getCurrently().getTemperature());
+                weatherData.setDesc(weatherResponse.getCurrently().getSummary());
+                String img = weatherResponse.getCurrently().getIcon();
+                //icon.setImageResource(Integer.parseInt(img));
+                //setIcon(img);
+                //city_text.setText(GetCity(latitude, longitude));
+                weatherData.setHrs(weatherResponse.getHourly().getSummary());
+                weatherData.setMydate(java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime()));
+                weatherData.setPres(weatherResponse.getCurrently().getPressure());
+                weatherData.setPrec(weatherResponse.getCurrently().getPrecipIntensity());
+                weatherData.setHumid(weatherResponse.getCurrently().getHumidity());
+                weatherData.setDewp(weatherResponse.getCurrently().getDewPoint());
+                weatherData.setMax(weatherResponse.getCurrently().getTemperatureMax());
+                weatherData.setMin(weatherResponse.getCurrently().getTemperatureMin());
+            }
+
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                Log.d("TAG", "Error while calling: " + retrofitError.getUrl());
+                Log.d("TAG", retrofitError.toString());
+            }
+        });
+        temp.setText(" " + weatherData.getTemperature());
+        temp_unit.setText("C");
+        sky_desc.setText(weatherData.getDesc());
+        city_text.setText(GetCity(latitude, longitude));
+        hourly.setText(weatherData.getHrs());
+        date_day.setText(weatherData.getMydate());
+        cloud.setText("Pressure : " + weatherData.getPres());
+        Log.d("TAG", weatherData.getMax() + " " + weatherData.getMin() + "max min");
+        Log.d("TAG", weatherData.getPres() + " " + "pressure");
+        precip.setText("Precipitation : " + weatherData.getPrec());
+        humidity.setText("Humidity : " + weatherData.getHumid());
+        dew.setText("Dew Point : " + weatherData.getDewp());
+        max_temp.setText("Max.T : " + weatherData.getMax());
+        min_temp.setText("Min.T : " + weatherData.getMin());
+        updateTimeOnEachSecond();
+
+                //new GetData(this).execute();
 
     }
 
@@ -124,10 +178,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void setIcon(String str) {
+    /*public void setIcon(String str) {
         //icon = (ImageView) findViewById(R.id.icon);
 
-        /*if (str.contains("sun") && str.contains("clear")) {
+        *//*if (str.contains("sun") && str.contains("clear")) {
             icon.setImageResource(R.mipmap.sunny);
         } else if (str.contains("night") && str.contains("clear")) {
             icon.setImageResource(R.mipmap.clrnt);
@@ -145,11 +199,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             icon.setImageResource(R.mipmap.rain);
         } else if (str.contains("day") && str.contains("cloudy")) {
             icon.setImageResource(R.mipmap.prtcld);
-        }*/
-    }
+        }*//*
+    }*/
 
     public String GetCity(double latitude, double longitude) {
         Log.d("TAG", latitude + " " + longitude + "one");
+        if (latitude==0||longitude==0){
+            latitude = getLocation.getLatitude();
+            longitude = getLocation.getLongitude();
+        }
         Geocoder geoCoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         StringBuilder builder = new StringBuilder();
         try {
@@ -245,10 +303,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected String doInBackground(Void... params) {
-            RequestBuilder weather = new RequestBuilder();
+
             Log.d("TAG", lat + "" + lng);
 
-
+            RequestBuilder weather = new RequestBuilder();
             Request request = new Request();
             request.setLat(lat + "");
             request.setLng(lng + "");
@@ -266,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     weatherData.setDesc(weatherResponse.getCurrently().getSummary());
                     String img = weatherResponse.getCurrently().getIcon();
                     //icon.setImageResource(Integer.parseInt(img));
-                    setIcon(img);
+                    //setIcon(img);
                     weatherData.setHrs(weatherResponse.getHourly().getSummary());
                     weatherData.setMydate(java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime()));
                     weatherData.setPres(weatherResponse.getCurrently().getPressure());

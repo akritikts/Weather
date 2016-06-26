@@ -42,7 +42,7 @@ public class Splash extends AppCompatActivity {
         if (gps.canGetLocation()) {
             lng = gps.getLongitude();
             lat = gps.getLatitude();
-            Log.d("TAG",lat+" "+lng);
+            Log.d("TAG",lat+" "+lng+" splash");
             if (lat==0||lng==0){
                 DialogGps dialogGps = new DialogGps();
                 dialogGps.show(getFragmentManager(),"GPS Alert");

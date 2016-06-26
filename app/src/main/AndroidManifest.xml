@@ -56,8 +56,7 @@
         <meta-data
             android:name="com.johnhiott.darkskyandroidlib"
             android:value="5b29d34aeee88dc47264e71ed058a592" />
-        <meta-data android:name="ccom.google.android.gms:play-services"
-            android:value="AIzaSyAX52peWddi3gJQfuB-5teYPoo5haPb5Iw"/>
+
 
 
 
