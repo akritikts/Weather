@@ -13,7 +13,6 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-
 /**
  * Created by akriti on 25/6/16.
  */
@@ -21,7 +20,7 @@ public class GetLocation implements GoogleApiClient.ConnectionCallbacks, GoogleA
     Context context;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
-    double latitude, longitude;
+    static double latitude, longitude;
 
     public GetLocation(Context context) {
         this.context = context;
@@ -31,38 +30,55 @@ public class GetLocation implements GoogleApiClient.ConnectionCallbacks, GoogleA
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-        }
+            mGoogleApiClient.connect();
 
-       /* if (Build.VERSION.SDK_INT >= 24 &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            latitude = mLastLocation.getLatitude();
-            longitude = mLastLocation.getLongitude();
-            Log.d("TAG",latitude+" cal lat");
-            Log.d("TAG",longitude+" cal lng");
+
+            if (Build.VERSION.SDK_INT >= 24 &&
+                    ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            if (mLastLocation != null) {
+                latitude = mLastLocation.getLatitude();
+                longitude = mLastLocation.getLongitude();
+                Log.d("TAG", latitude + " cal lat");
+                Log.d("TAG", longitude + " cal lng");
                 //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
                 //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-        }*/
+            }
+            }
+        }
     }
+    /*protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }*/
+
 
     public double getLatitude() {
         Log.d("TAG",latitude+" get lat");
+        //latitude = mLastLocation.getLatitude();
         return latitude;
     }
 
 
     public double getLongitude() {
+        //longitude = mLastLocation.getLongitude();
         Log.d("TAG",longitude +" get lng");
+
         return longitude;
     }
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.d("TAG","Callback called");
         if (Build.VERSION.SDK_INT >= 24 &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -75,8 +91,6 @@ public class GetLocation implements GoogleApiClient.ConnectionCallbacks, GoogleA
             longitude = mLastLocation.getLongitude();
             Log.d("TAG",latitude+" cal lat");
             Log.d("TAG",longitude+" cal lng");
-                /*mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-                mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));*/
         }
 
     }
@@ -90,4 +104,5 @@ public class GetLocation implements GoogleApiClient.ConnectionCallbacks, GoogleA
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
 }

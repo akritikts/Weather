@@ -56,6 +56,8 @@
         <meta-data
             android:name="com.johnhiott.darkskyandroidlib"
             android:value="5b29d34aeee88dc47264e71ed058a592" />
+        <meta-data android:name="com.google.android.gms.9.0.2"
+            android:value="9.0.2" />
 
 
 
