@@ -50,9 +50,9 @@ import silive.in.weather.Models.WeatherData;
 import silive.in.weather.R;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    static double latitude, longitude;
     LinearLayout weather_info;
     TextView city_text, temp, temp_unit, sky_desc, current_time, date_day, current_time_min, current_time_sec, hourly;
-    double latitude, longitude;
     ImageView icon;
     ImageButton ref;
     TextView humidity, dew, cloud, precip, max_temp, min_temp;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     boolean mRequestingLocationUpdates;
     LocationListener mLocationListener;
     Location mLastLocation;
-
+    String mLastUpdateTime;
 
 
     @Override
@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mGoogleApiClient.connect();
         }
         Log.d("TAG", latitude + " " + longitude + "inside onCreate");
+        if (latitude ==0||longitude ==0){
+            updateValuesFromBundle(savedInstanceState);
+        }
 
         weatherData = new WeatherData();
             /*getLocation = new GetLocation(this);
@@ -267,27 +270,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         if (mRequestingLocationUpdates) {
-            startLocationUpdates();}
+            startLocationUpdates();
+        }
 
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d("TAG","Connection suspended");
+        Log.d("TAG", "Connection suspended");
 
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("TAG","Connection failed");
+        Log.d("TAG", "Connection failed");
 
     }
+
     protected void startLocationUpdates() {
         if (Build.VERSION.SDK_INT >= 24 &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         }
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,mLocationListener);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
     }
 
     public void updateTimeOnEachSecond() {
@@ -310,6 +315,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         current_time.setText(String.valueOf(hrs + " :"));
                         current_time_min.setText(String.valueOf(min + " :"));
                         current_time_sec.setText(String.valueOf(sec));
+                        mLastUpdateTime = String.valueOf(hrs+":");
+                        mLastUpdateTime.concat(String.valueOf(min + " :"));
+                        mLastUpdateTime.concat(String.valueOf(sec));
                     }
                 });
 
@@ -376,6 +384,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return null;
 
+    }
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean("REQUESTING_LOCATION_UPDATES_KEY",
+                mRequestingLocationUpdates);
+        savedInstanceState.putParcelable("LOCATION_KEY", mLastLocation);
+        savedInstanceState.putString("LAST_UPDATED_TIME_STRING_KEY", mLastUpdateTime);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.keySet().contains("REQUESTING_LOCATION_UPDATES_KEY")) {
+                mRequestingLocationUpdates = savedInstanceState.getBoolean(
+                        "REQUESTING_LOCATION_UPDATES_KEY");
+                //setButtonsEnabledState();
+            }
+            if (savedInstanceState.keySet().contains("LOCATION_KEY")) {
+                mLastLocation = savedInstanceState.getParcelable("LOCATION_KEY");
+            }
+            if (savedInstanceState.keySet().contains("LAST_UPDATED_TIME_STRING_KEY")) {
+                mLastUpdateTime = savedInstanceState.getString(
+                        "LAST_UPDATED_TIME_STRING_KEY");
+                updateTimeOnEachSecond();
+            }
+
+        }
     }
 
 
