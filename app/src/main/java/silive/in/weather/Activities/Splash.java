@@ -72,8 +72,6 @@ public class Splash extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         if (info == null) {
-            //   Toast.makeText(this, "No Internet Connection", Toast.LENGTH_SHORT).show();
-            //no_net_connection.setVisibility(View.VISIBLE);
             Snackbar snackbar = Snackbar
                     .make(splash, "No internet connection!", Snackbar.LENGTH_LONG)
                     .setAction("RETRY", new View.OnClickListener() {

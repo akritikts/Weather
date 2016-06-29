@@ -63,15 +63,12 @@ public class GetLocation implements GoogleApiClient.ConnectionCallbacks, GoogleA
 
     public double getLatitude() {
         Log.d("TAG",latitude+" get lat");
-        //latitude = mLastLocation.getLatitude();
         return latitude;
     }
 
 
     public double getLongitude() {
-        //longitude = mLastLocation.getLongitude();
         Log.d("TAG",longitude +" get lng");
-
         return longitude;
     }
 

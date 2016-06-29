@@ -2,17 +2,34 @@ package silive.in.weather.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.johnhiott.darkskyandroidlib.ForecastApi;
 import com.johnhiott.darkskyandroidlib.RequestBuilder;
 import com.johnhiott.darkskyandroidlib.models.Request;
@@ -32,17 +49,24 @@ import silive.in.weather.Models.GetLocation;
 import silive.in.weather.Models.WeatherData;
 import silive.in.weather.R;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    LinearLayout weather_info;
     TextView city_text, temp, temp_unit, sky_desc, current_time, date_day, current_time_min, current_time_sec, hourly;
     double latitude, longitude;
     ImageView icon;
     ImageButton ref;
     TextView humidity, dew, cloud, precip, max_temp, min_temp;
     String APIKey = "5b29d34aeee88dc47264e71ed058a592";
-    String GeoAPIKey = "AIzaSyAX52peWddi3gJQfuB-5teYPoo5haPb5Iw";
+    //String GeoAPIKey = "AIzaSyAX52peWddi3gJQfuB-5teYPoo5haPb5Iw";
     WeatherData weatherData;
     GetLocation getLocation;
     Context context;
+    GoogleApiClient mGoogleApiClient;
+    LocationRequest mLocationRequest;
+    boolean mRequestingLocationUpdates;
+    LocationListener mLocationListener;
+    Location mLastLocation;
+
 
 
     @Override
@@ -50,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
+        //Initializing the layout contents
+        weather_info = (LinearLayout) findViewById(R.id.weather_info);
         current_time = (TextView) findViewById(R.id.current_time);
         current_time_min = (TextView) findViewById(R.id.current_time_min);
         current_time_sec = (TextView) findViewById(R.id.current_time_sec);
@@ -68,14 +94,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         icon = (ImageView) findViewById(R.id.icon);
         ref = (ImageButton) findViewById(R.id.ref);
         ref.setOnClickListener(this);
-        weatherData = new WeatherData();
-        getLocation = new GetLocation(this);
-        latitude = getLocation.getLatitude();
-        longitude = getLocation.getLongitude();
+        //check for connection
+        checkConnection();
+        //Google API client
+        mLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if (Build.VERSION.SDK_INT >= 24 &&
+                        ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                            mGoogleApiClient);
+                    if (mLastLocation != null) {
+                        latitude = mLastLocation.getLatitude();
+                        longitude = mLastLocation.getLongitude();
+                        Log.d("TAG", latitude + " cal lat");
+                        Log.d("TAG", longitude + " cal lng");
+                        //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+                        //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+                    }
+                }
+
+            }
+        };
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(context)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            mGoogleApiClient.connect();
+        }
         Log.d("TAG", latitude + " " + longitude + "inside onCreate");
 
-
-        ForecastApi.create(APIKey);
+        weatherData = new WeatherData();
+            /*getLocation = new GetLocation(this);
+            latitude = getLocation.getLatitude();
+            longitude = getLocation.getLongitude();*/
         /*final GPSTracker gpsTracker = new GPSTracker(getApplicationContext());
         if (gpsTracker.canGetLocation()) {
 
@@ -83,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             longitude = gpsTracker.getLongitude();
             Log.d("TAG", latitude + " " + longitude + "inside onCreate");
         }*/
+        ForecastApi.create(APIKey);
+
         RequestBuilder weather = new RequestBuilder();
         Request request = new Request();
         request.setLat(latitude + "");
@@ -134,8 +192,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         max_temp.setText("Max.T : " + weatherData.getMax());
         min_temp.setText("Min.T : " + weatherData.getMin());
         updateTimeOnEachSecond();
+        //new GetData(this).execute();
 
-                //new GetData(this).execute();
+    }
+
+    public void checkConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+        if (info == null) {
+            Snackbar snackbar = Snackbar
+                    .make(weather_info, "No internet connection!", Snackbar.LENGTH_LONG)
+                    .setAction("RETRY", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+
+                            checkConnection();
+                        }
+                    });
+
+// Changing message text color
+            snackbar.setActionTextColor(Color.RED);
+
+// Changing action button text color
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(Color.YELLOW);
+            snackbar.show();
+        } else {
+
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    /*cornr.setVisibility(View.VISIBLE);
+                    Intent intent = new Intent(Splash.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();*/
+                }
+            }, 2000);
+
+
+        }
 
     }
 
@@ -148,6 +246,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //WeatherUpdate(latitude,longitude);
                 break;
         }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.d("TAG", "Callback called");
+        if (Build.VERSION.SDK_INT >= 24 &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            if (mLastLocation != null) {
+                latitude = mLastLocation.getLatitude();
+                longitude = mLastLocation.getLongitude();
+                Log.d("TAG", latitude + " cal lat");
+                Log.d("TAG", longitude + " cal lng");
+                //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+                //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+            }
+        }
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();}
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d("TAG","Connection suspended");
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("TAG","Connection failed");
+
+    }
+    protected void startLocationUpdates() {
+        if (Build.VERSION.SDK_INT >= 24 &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        }
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,mLocationListener);
     }
 
     public void updateTimeOnEachSecond() {
@@ -204,10 +344,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public String GetCity(double latitude, double longitude) {
         Log.d("TAG", latitude + " " + longitude + "one");
-        if (latitude==0||longitude==0){
+        /*if (latitude == 0 || longitude == 0) {
             latitude = getLocation.getLatitude();
             longitude = getLocation.getLongitude();
-        }
+        }*/
         Geocoder geoCoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         StringBuilder builder = new StringBuilder();
         try {
