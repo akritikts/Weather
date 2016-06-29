@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Context context;
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
-    boolean mRequestingLocationUpdates;
+    boolean mRequestingLocationUpdates = true;
     LocationListener mLocationListener;
     Location mLastLocation;
     String mLastUpdateTime;
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         if (info == null) {
             Snackbar snackbar = Snackbar
-                    .make(weather_info, "No internet connection!", Snackbar.LENGTH_LONG)
+                    .make(weather_info, "No Internet Connection", Snackbar.LENGTH_LONG)
                     .setAction("RETRY", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
