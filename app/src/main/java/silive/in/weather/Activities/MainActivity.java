@@ -13,8 +13,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -24,8 +22,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -97,12 +97,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //check for connection
         checkConnection();
         //Google API client
+        if (checkPlayServices()) {
+
+            // Building the GoogleApi client
+            buildGoogleApiClient();
+        }
+
+        /*if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(context)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            mGoogleApiClient.connect();
+        }*/
+        Log.d("TAG", latitude + " " + longitude + "inside onCreate");
+        if (latitude ==0||longitude ==0){
+            updateValuesFromBundle(savedInstanceState);
+        }
+
+        weatherData = new WeatherData();
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if (Build.VERSION.SDK_INT >= 24 &&
-                        ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                             mGoogleApiClient);
@@ -116,22 +136,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
 
+
             }
         };
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(context)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            mGoogleApiClient.connect();
-        }
-        Log.d("TAG", latitude + " " + longitude + "inside onCreate");
-        if (latitude ==0||longitude ==0){
-            updateValuesFromBundle(savedInstanceState);
-        }
-
-        weatherData = new WeatherData();
             /*getLocation = new GetLocation(this);
             latitude = getLocation.getLatitude();
             longitude = getLocation.getLongitude();*/
@@ -245,54 +252,93 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ref:
+                displayLocation();
                 new GetData(this).execute();
                 //WeatherUpdate(latitude,longitude);
                 break;
         }
     }
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+    }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        Log.d("TAG", "Callback called");
-        if (Build.VERSION.SDK_INT >= 24 &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    private boolean checkPlayServices() {
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        int resultCode = api.isGooglePlayServicesAvailable(this);
 
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-            if (mLastLocation != null) {
-                latitude = mLastLocation.getLatitude();
-                longitude = mLastLocation.getLongitude();
-                Log.d("TAG", latitude + " cal lat");
-                Log.d("TAG", longitude + " cal lng");
-                //mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-                //mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (api.isUserResolvableError(resultCode)) {
+                api.showErrorDialogFragment(this,resultCode,GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE);
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
             }
+            return false;
         }
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
+        return true;
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
         }
-
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
-        Log.d("TAG", "Connection suspended");
+    protected void onResume() {
+        super.onResume();
 
+        checkPlayServices();
     }
 
+    /**
+     * Google api callback methods
+     */
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("TAG", "Connection failed");
-
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i("TAG", "Connection failed: ConnectionResult.getErrorCode() = "
+                + result.getErrorCode());
     }
 
-    protected void startLocationUpdates() {
+    private void displayLocation() {
         if (Build.VERSION.SDK_INT >= 24 &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            return;
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
+
+        mLastLocation = LocationServices.FusedLocationApi
+                .getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+             latitude = mLastLocation.getLatitude();
+             longitude = mLastLocation.getLongitude();
+
+            //lblLocation.setText(latitude + ", " + longitude);
+
+        } else {
+
+            //lblLocation.setText("(Couldn't get the location. Make sure location is enabled on the device)");
+        }
+    }
+
+
+    @Override
+    public void onConnected(Bundle arg0) {
+
+        // Once connected with google api, get the location
+        displayLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int arg0) {
+        mGoogleApiClient.connect();
     }
 
     public void updateTimeOnEachSecond() {
